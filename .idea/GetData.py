@@ -8,8 +8,10 @@ import time
 from Agilent import Agilent
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
+import warnings
 from sys import argv
 import pyqtgraph.exporters
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 
@@ -57,9 +59,9 @@ def MeasurementsSettings():
     TemperatureArray = np.linspace(Temperature['Start'], Temperature['Stop'], Temperature['Points'])
 
 
-    File = {'Dir':'C:/Users/guthrie/PycharmProjects/GetData/.idea/Data' + str(time.strftime("%Y.%m.%d-%H.%M.%S")) + '/',
+    File = {'Dir':'C:/Users/guthrie/PycharmProjects/GetData/.idea/Data' + str(time.strftime("%Y-%m-%d-%H-%M-%S")) + '/',
             'Log':'C:/Users/guthrie/PycharmProjects/GetData/.idea/Labbook/Labbook.Tex',
-            'Data': 'C:/Users/guthrie/PycharmProjects/GetData/.idea/Plots/Plot1' + str(time.strftime("%Y.%m.%d-%H.%M.%S"))}
+            'Data': 'C:/Users/guthrie/PycharmProjects/GetData/.idea/Plots/Plot1' + str(time.strftime("%Y-%m-%d-%H-%M-%S"))}
 
 
     NetworkAnalyzer = {'Frequency': Frequency,
@@ -87,15 +89,17 @@ def Plot(Settings,sReal,sImag,frequency):
     phase = []
     magnitude = []
     for x in range(0, len(sReal)):
-        phase.append(np.arctan(sImag[x] / sReal[x]))
-        magnitude.append(np.sqrt(np.power(sImag[x], 2) + np.power(sReal[x], 2)))
+        if (sReal != 0):
+            phase.append(np.arctan(sImag[x] / sReal[x]))
+            magnitude.append(np.sqrt(np.power(sImag[x], 2) + np.power(sReal[x], 2)))
+        else: phase.append(0)
 
 
     #Create Window
 
-    win = pg.GraphicsWindow(title="Basic plotting examples")
+    win = pg.GraphicsWindow(title="")
     win.resize(600, 900)
-    win.setBackground((255,255,255))
+
     win.setWindowTitle('Frequency Sweep')
 
 
@@ -114,6 +118,7 @@ def Plot(Settings,sReal,sImag,frequency):
     p2.plot(frequency, phase, pen=(0, 0, 255))
     p2.setLabel('left', "Phase", units='')
     p2.setLabel('bottom', "Frequency", units='')
+
 
 
     if __name__ == '__main__':
@@ -202,7 +207,6 @@ def Labbook(Settings):
         book.write("\n")
 
     book.close()
-
 
 
 
